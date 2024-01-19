@@ -153,13 +153,14 @@ class DiameterAssociation(object):
         self.transport.start()
         self.transport.run()
 
+        diameter_conn_logger.debug("Starting DiameterAssociation's thread.")
+
         threading.Thread(name="recv_message_monitor",
                          target=self.recv_message_from_queue).start()
 
 
     def close(self) -> None:
-        self.__is_connected()
-
+        diameter_conn_logger.debug("Closing DiameterAssociation's thread.")
         self.state_is_active = False
         self._stop_threads = True
         self.transport.close()
@@ -429,6 +430,7 @@ class Diameter:
                                            "closed")
 
         self._peer_state_machine.close()
+        self._association.close()
 
 
     def send_messages(self, msgs: List[Type[DiameterMessage]]) -> None:
@@ -526,7 +528,7 @@ class Diameter:
             time.sleep(WAITING_CONN_TIMER)
             yield self
 
-            if self.is_open():
+            if not self.is_closed():
                 self.close()
 
         except KeyboardInterrupt:
