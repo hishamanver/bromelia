@@ -164,17 +164,13 @@ class DiameterAssociation(object):
         self.state_is_active = False
         self._stop_threads = True
         self.transport.close()
-        self.transport = None
 
 
     def recv_message_from_queue(self) -> None:
-        while not self._stop_threads and self.transport:
+        while not self._stop_threads and self.transport and self.transport.is_connected:
             self.transport._recv_data_available.wait(timeout=1)
 
             self.lock.acquire()
-
-            if self.transport is None:
-                break
 
             data_stream = copy.copy(self.transport._recv_data_stream)
             self.transport._recv_data_stream = b""
@@ -267,7 +263,7 @@ class DiameterAssociation(object):
 
             stream += msg.dump()
 
-        if self.transport:
+        if self.transport and self.transport.is_connected:
             if not self.transport.is_write_mode():
                 diameter_conn_logger.debug("Transport Layer is not in WRITE "\
                                            "mode, so we can send data stream.")
@@ -278,7 +274,7 @@ class DiameterAssociation(object):
                                            "mode, so we cannot send data "\
                                            "stream.")
 
-                while not self._stop_threads and self.transport:
+                while not self._stop_threads and self.transport and self.transport.is_connected:
                     self.transport.write_mode_on.wait()
                     if not self.transport.is_write_mode():
                         diameter_conn_logger.debug("Transport Layer is not in "\
@@ -429,7 +425,6 @@ class Diameter:
                                            "Peer State Machine is already "\
                                            "closed")
 
-        self._association.close()
         self._peer_state_machine.close()
 
 
