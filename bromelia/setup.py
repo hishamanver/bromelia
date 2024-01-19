@@ -429,8 +429,8 @@ class Diameter:
                                            "Peer State Machine is already "\
                                            "closed")
 
-        self._peer_state_machine.close()
         self._association.close()
+        self._peer_state_machine.close()
 
 
     def send_messages(self, msgs: List[Type[DiameterMessage]]) -> None:
