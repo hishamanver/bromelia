@@ -79,24 +79,22 @@ class TcpConnection():
 
 
     def close(self) -> None:
-        if not self.is_connected:
-            raise ConnectionError("There is no transport connection up for "\
-                                  "this PeerNode")
+        if self.is_connected:
 
-        self.is_connected = False
-        try:
-            self.selector.unregister(self.sock)
-            tcp_connection.debug(f"[Socket-{self.sock_id}] De-registering "\
-                                 f"Socket from Selector address: "\
-                                 f"{self.selector.get_map()}")
+            self.is_connected = False
+            try:
+                self.selector.unregister(self.sock)
+                tcp_connection.debug(f"[Socket-{self.sock_id}] De-registering "\
+                                    f"Socket from Selector address: "\
+                                    f"{self.selector.get_map()}")
 
-            self.sock.close()
-            tcp_connection.debug(f"[Socket-{self.sock_id}] Shutting "\
-                                 f"down Socket")
+                self.sock.close()
+                tcp_connection.debug(f"[Socket-{self.sock_id}] Shutting "\
+                                    f"down Socket")
 
-        except KeyError as e:
-            tcp_connection.debug(f"[Socket-{self.sock_id}] There is no "\
-                                 f"such Selector registered")
+            except KeyError as e:
+                tcp_connection.debug(f"[Socket-{self.sock_id}] There is no "\
+                                    f"such Selector registered")
 
         self._stop_threads = True
 
