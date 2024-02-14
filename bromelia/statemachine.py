@@ -576,9 +576,7 @@ class PeerStateMachine():
 
     def close(self) -> None:
         statemachine_logger.debug("Closing PeerStateMachine's thread.")
-        self.association.state_is_active = False
-        self.is_running = False
-
+        self.current_state.set_closed_state()
 
     def get_current_state(self) -> str:
         if isinstance(self.current_state, Closed):
