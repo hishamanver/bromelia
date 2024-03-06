@@ -106,8 +106,7 @@ class TcpConnection():
             raise ConnectionError(f"[Socket-{self.sock_id}] There is no "\
                                   f"transport connection up for this Peer")
         threading.Thread(name="transport_layer_thread",
-                         target=self._run).start()
-
+                         target=self._run, daemon=True).start()
 
     def _run(self) -> None:
         while self.is_connected and not self._stop_threads:
